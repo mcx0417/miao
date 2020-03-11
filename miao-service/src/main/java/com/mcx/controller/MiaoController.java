@@ -29,7 +29,6 @@ public class MiaoController {
         QueryWrapper<Cat> queryWrapper = new QueryWrapper<Cat>();
         queryWrapper.groupBy("category");
         JSONArray ja = JSONArray.parseArray(JSON.toJSONString(catMapper.selectList(queryWrapper)));
-        /**/
         return ja;
     }
 
