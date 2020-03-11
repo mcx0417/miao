@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Miao</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
+    <link href="https://fonts.lug.ustc.edu.cn/css?family=Noto+Sans+SC:100,300,400,500,700,900" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+    <div class="bs-example" data-example-id="inverted-navbar">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button aria-expanded="false" class="navbar-toggle collapsed"
+                            data-target="#bs-example-navbar-collapse-9"
+                            data-toggle="collapse" type="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/loginPage">(=￣ω￣=)</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-9">
+                    <ul class="nav navbar-nav">
+                        <li @click="getInformation" class="active"><a href="#">我全都要</a></li>
+                        <li><a @click="getSmall" href="#">小个的</a></li>
+                        <li><a @click="getMedium" href="#">中型的</a></li>
+                        <li><a @click="getLarge" href="#">大只的</a></li>
+                        <li><span>.....................................................
+                            ..........................................................
+                            ...........................................................
+                            ...............................................</span></li>
+                        <li><a>SexyMusic</a></li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+    </div>
+    <h1 style="text-align: center">云养猫 —— 猫咪图鉴💝</h1>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-sm-3 col-xs-6 col-md-2" v-for="(item,index) in arr">
+            <div class="thumbnail">
+                <img :src="item.image" @dblclick="setLoved(index)"
+                     alt="..." style="clip-path: inset(0 round 20px);">
+                <div class="caption">
+                    <h5 id="category" style="text-align: center"><span @click="setLoved(index)" style="cursor:pointer">{{loveMap[item.loved]}}</span>{{item.category}}
+                    </h5>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            arr: [],
+            loveMap: ["💛", "💝"],
+        },
+        methods: {
+            setLoved: function (index) {
+                var that = this;
+                console.log(index);
+                console.log(that.arr[index].loved);
+                axios.get('/love/2').then(function (response) {
+                    response.data.forEach(v => {
+                        v.miaoid--;
+                        console.log(v.miaoid);
+                        that.arr[v.miaoid].loved = 1;
+
+                    });
+                    if (that.arr[index].loved == 0) {
+                        index++;
+                        axios.post('/love/' + 2 + "&" + Number(index)).then(function (response) {
+                            console.log(response);
+                            if (response.data == 1) {
+                                index--;
+                                that.displayLoved(index);
+                            } else {
+                                index--;
+                                axios.get('/love/2').then(function (response) {
+                                    response.data.forEach(v => {
+                                        v.miaoid--;
+                                        console.log(v.miaoid);
+                                        that.arr[v.miaoid].loved = 1;
+
+                                    });
+                                });
+                                that.displayLoved(index);
+                            }
+                        });
+                    } else {
+                        index++;
+                        axios.delete('/love/' + 2 + "and" + Number(index)).then(function (response) {
+                            console.log(response);
+                            if (response.data == 1) {
+                                index--;
+                                that.displayLoved(index);
+                            }else {
+                                index--;
+                                axios.get('/love/2').then(function (response) {
+                                    response.data.forEach(v => {
+                                        v.miaoid--;
+                                        console.log(v.miaoid);
+                                        that.arr[v.miaoid].loved = 1;
+
+                                    });
+                                });
+                                that.displayLoved(index);
+                            }
+                        });
+                    }
+                });
+            }
+            ,
+            displayLoved: function (index) {
+
+                if (this.arr[index].loved == 1) {
+                    this.arr[index].loved = 0;
+                } else if (this.arr[index].loved == 0) {
+                    this.arr[index].loved = 1;
+                }
+            }
+            ,
+            getInformation: function () {
+                var that = this;
+                axios.get('/miao/all').then(function (response) {
+                    that.arr = (response.data);
+                    console.log(response.data);
+                    axios.get('/love/2').then(function (response) {
+                        response.data.forEach(v => {
+                            v.miaoid--;
+                            console.log(v.miaoid);
+                            that.arr[v.miaoid].loved = 1;
+                        });
+                    });
+
+                });
+
+            }
+            ,
+            getSmall: function () {
+                var that = this;
+                axios.get('/miao/small').then(function (response) {
+                    that.arr = (response.data);
+
+                })
+            }
+            ,
+            getMedium: function () {
+                var that = this;
+                axios.get('/miao/medium').then(function (response) {
+                    that.arr = (response.data);
+
+                })
+            }
+            ,
+            getLarge: function () {
+                var that = this;
+                axios.get('/miao/large').then(function (response) {
+                    that.arr = (response.data);
+
+                })
+            }
+            ,
+
+        },
+        mounted: function () {
+            this.$nextTick(function () {
+                this.getInformation();
+            })
+        }
+    })
+
+
+</script>
+
+</body>
+<style>
+    h1 {
+        font-family: "Noto Sans SC";
+        font-weight: 900;
+    }
+
+    #category {
+        font-family: "Noto Sans SC";
+        font-weight: 300;
+    }
+
+    .navbar-collapse {
+        font-family: "Noto Sans SC";
+        font-weight: 500;
+    }
+</style>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <!-- Meta tags -->
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
+    <link href="https://fonts.lug.ustc.edu.cn/css?family=Noto+Sans+SC:100,300,400,500,700,900" rel="stylesheet">
+</head>
+
+
+<div class="container" id="app" style="width: 350px;">
+    <br>
+    <h2 class=" text-center">{{hint}}</h2>
+    <div class="container" style="width: 275px;">
+        <br>
+        <form action=# id="registerForm" method="GET">
+            <div class="form-group">
+                <input class="form-control" id="exInputUsername" name="username" placeholder="用户名填在这"
+                       required type="text" v-model="username">
+            </div>
+            <div class="form-group">
+                <input class="form-control" id="exInputPassword" name="password" placeholder="密码填在这~"
+                       required type="password" v-model="password">
+            </div>
+            <br>
+            <div class="form-group" style="text-align: center;">
+                <!-- onclick="document.getElementById('registerForm').method='POST';document.getElementById('registerForm').submit();"-->
+                <button @click="send" class="btn btn-success" id="hint" type="button">
+                    点此登陆
+                </button>
+                <br>
+                <a href="/registerPage">在此注册</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            username: "",
+            password: "",
+            hint: "欢迎回来!"
+        },
+        methods: {
+            send: function () {
+                var that = this;
+                axios.get('/login/' + this.username + '&' + this.password).then(function (response) {
+                    if (response.data) {
+                        if (response.data == "login success") {
+                            that.time1(that);
+                        } else {
+                            that.time2(that);
+                        }
+                    }
+                }, function (err) {
+                    console.log("请求错误")
+                })
+            },
+            time1: function (that) {
+                document.getElementById("exInputUsername").style.borderColor = "green";
+                document.getElementById("exInputPassword").style.borderColor = "green";
+                that.hint = "登陆成功!";
+                setTimeout(function () {
+                    window.location.href = '/miaoPage';
+                    document.getElementById("exInputUsername").style.borderColor = "";
+                    document.getElementById("exInputPassword").style.borderColor = "";
+                    that.hint = "欢迎回来!";
+                }, 2000);
+            },
+            time2: function (that) {
+
+                document.getElementById("exInputUsername").style.borderColor = "red";
+                document.getElementById("exInputPassword").style.borderColor = "red";
+                that.hint = "登陆失败,请再试一次";
+                setTimeout(function () {
+                    document.getElementById("exInputUsername").style.borderColor = "";
+                    document.getElementById("exInputPassword").style.borderColor = "";
+                    that.hint = "欢迎回来!";
+                }, 2000);
+            }
+        }
+    })
+</script>
+</body>
+<style>
+    h2 {
+        font-family: "Noto Sans SC";
+        font-weight: 900;
+    }
+
+    form {
+        font-family: "Noto Sans SC";
+        font-weight: 300;
+    }
+
+
+</style>
+
+</html>

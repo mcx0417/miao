@@ -1,0 +1,12 @@
+server:
+  port: 1050
+
+spring:
+  application:
+    name: Front-end
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka,http://127.0.0.1:10000/eureka
+

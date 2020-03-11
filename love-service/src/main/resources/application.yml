@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: love-service
+  datasource:
+    url: jdbc:mysql:///formybatis?useUnicode=true&characterEncoding=utf8&serverTimezone=CST
+    username: root
+    password: 19960417
+    driver-class-name: com.mysql.cj.jdbc.Driver
+server:
+  port: 1090
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka,http://127.0.0.1:10000/eureka

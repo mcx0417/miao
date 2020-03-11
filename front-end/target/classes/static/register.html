@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register</title>
+    <!-- Meta tags -->
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
+    <link href="https://fonts.lug.ustc.edu.cn/css?family=Noto+Sans+SC:100,300,400,500,700,900" rel="stylesheet">
+</head>
+
+<body>
+<div class="container" id="app" style="width: 350px;">
+    <h2 class="text-center">{{hint}}</h2>
+    <br>
+    <form action="http://localhost:1070/register" id="registerForm" method="GET">
+        <div class="form-group">
+            <input @blur="check1" @keyup="check0" class="form-control" id="exInputUsername"
+                   name="username" placeholder="用户名长度6-20位，可以使用数字字母和下划线" required type="text" v-model="username">
+        </div>
+        <div class="form-group">
+            <input @blur="check2" @keyup="check2" @keyup.enter="register" class="form-control"
+                   id="exInputPassword"
+                   name="password" placeholder="密码长度6-20位，可以使用数字字母和下划线" required type="password" v-model="password">
+        </div>
+        <div class="form-group" style="text-align: center;">
+            <button @click="register" class="btn btn-success" type="button">
+                注册
+            </button>
+            <br>
+            <a href="/loginPage">点此登陆</a>
+        </div>
+    </form>
+</div>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            username: "",
+            password: "",
+            hint: "注册，马上就好!",
+            usernameValid: 0,
+            usernameRepeat: 0,
+            passwordValid: 0
+        },
+        methods: {
+            check0: function () {
+
+                var patrn = /^(\w){6,20}$/;
+                var a = patrn.exec(this.username);
+
+                if (!a) {
+                    document.getElementById("exInputUsername").style.borderColor = "red";
+                    this.hint = "用户名长度6-20位哦";
+                    this.usernameValid = 0;
+                } else {
+                    document.getElementById("exInputUsername").style.borderColor = "green";
+                    this.hint = "注册，马上就好!";
+                    this.usernameValid = 1;
+                }
+
+            },
+            check1: function () {
+                var that = this;
+                axios.get('/register/' + this.username).then(function (response) {
+                    console.log(that.usernameValid);
+                    if (that.usernameValid = 1) {
+                        if (response.data == "register fail") {
+                            document.getElementById("exInputUsername").style.borderColor = "red";
+                            that.hint = "抱歉！用户名重复了"
+                            that.usernameRepeat = 0;
+                        } else {
+                            document.getElementById("exInputUsername").style.borderColor = "green";
+                            that.hint = "注册，马上就好!"
+                            that.usernameRepeat = 1;
+                        }
+                    }
+                })
+            },
+            check2: function () {
+                var patrn = /^(\w){6,20}$/;
+                if (!patrn.exec(this.password)) {
+                    document.getElementById("exInputPassword").style.borderColor = "red";
+                    this.hint = "密码长度6-20位哦";
+                    this.passwordValid = 0;
+                } else {
+                    document.getElementById("exInputPassword").style.borderColor = "green";
+                    this.hint = "注册，马上就好!";
+                    this.passwordValid = 1;
+                }
+
+            },
+            register: function () {
+                this.check0();
+                if (this.usernameValid == 1) {
+                    this.check2();
+                }
+                console.log("usernameValid" + this.usernameValid);
+                console.log("usernameRepeat" + this.usernameRepeat);
+                console.log("passwordValid" + this.passwordValid);
+                var that = this;
+                if (this.usernameValid && this.usernameRepeat && this.passwordValid) {
+                    axios.post('/register/' + this.username + '&' + this.password).then(function (response) {
+                        console.log(response)
+                        if (response.data == "register success") {
+                            window.location.href = '/loginPage';
+                        } else {
+                            console.log("出错");
+                        }
+                    })
+                }
+            }
+        }
+    })
+
+</script>
+</body>
+<style>
+    h2 {
+        font-family: "Noto Sans SC";
+        font-weight: 700;
+    }
+
+    form {
+        font-family: "Noto Sans SC";
+        font-weight: 300;
+    }
+</style>
+</html>
